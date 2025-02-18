@@ -4,7 +4,7 @@ import config from '../config';
 
 // Get the local IP address from window.location
 
-const CHAT_API_URL = `${config.apiUrl}/api/chat`;
+const CHAT_API_URL = `${config.apiUrl}/chat`;
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,9 +47,14 @@ function Chatbot() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ message: userMessage })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       if (data.success) {
@@ -64,6 +69,7 @@ function Chatbot() {
         throw new Error(data.message);
       }
     } catch (error) {
+      console.error('Chat error:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: "Sorry, I'm having trouble responding right now. Please try again later.",

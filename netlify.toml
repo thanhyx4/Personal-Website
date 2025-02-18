@@ -7,6 +7,8 @@
   from = "/api/chat"
   to = "/.netlify/functions/chat"
   status = 200
+  force = true
+  headers = {Access-Control-Allow-Origin = "*"}
 
 [[redirects]]
   from = "/api/*"
@@ -19,6 +21,7 @@
   to = "/.netlify/functions/chat"
   status = 200
   force = true
+  headers = {Access-Control-Allow-Origin = "*"}
 
 [[redirects]]
   from = "/api/spending/*"
@@ -33,3 +36,11 @@
 
 [build.environment]
   NODE_VERSION = "18" 
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Content-Type = "application/json"

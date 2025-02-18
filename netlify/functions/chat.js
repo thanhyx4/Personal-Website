@@ -6,7 +6,18 @@ import Anthropic from '@anthropic-ai/sdk';
 import serverless from 'serverless-http';
 
 const app = express();
+
+// Add proper CORS and body parsing middleware
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Add request logging for debugging
+app.use((req, res, next) => {
+  console.log('Request body:', req.body);
+  console.log('Request headers:', req.headers);
+  next();
+});
 
 // Initialize AI models
 const openai = new OpenAI({
@@ -123,12 +134,23 @@ const getAIResponse = async (message) => {
   return getMockResponse(message);
 };
 
-// Chat endpoints
+// Chat endpoints with better error handling
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
-    console.log(message);
+    
+    if (!message) {
+      console.error('No message provided in request body');
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Message is required'
+      });
+    }
+
+    console.log('Processing message:', message);
     const response = await getAIResponse(message);
+    
+    console.log('AI Response:', response);
     res.json({ 
       success: true, 
       message: response.content,
@@ -140,12 +162,21 @@ app.post('/api/chat', async (req, res) => {
     console.error('Chat error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to process chat message.'
+      message: 'Failed to process chat message',
+      error: error.message
     });
   }
 });
 
-
+// Add error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: err.message
+  });
+});
 
 // Export the serverless handler
 export const handler = serverless(app); 
