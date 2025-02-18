@@ -1,0 +1,121 @@
+[
+  {
+    "date": "2025-02-14T03:57:16.431Z",
+    "amount": 50000,
+    "category": "food",
+    "description": "// example inputs: \"lunch at restaurant yesterday\" \"bought new shoes 500.000 on \" \"taxi to work 200k\" \"internet bill 300.000 last monday\"",
+    "timestamp": "2025-02-15T03:57:16.432Z"
+  },
+  {
+    "date": "2025-02-14T03:58:04.622Z",
+    "amount": 50000,
+    "category": "food",
+    "description": "\"lunch at restaurant yesterday\" \"bought new shoes 500.000 on \" \"taxi to work 200k\" \"internet bill 300.000 last monday\"",
+    "timestamp": "2025-02-15T03:58:04.623Z"
+  },
+  {
+    "date": "2025-02-10T04:00:16.280Z",
+    "amount": 300000,
+    "category": "utilities",
+    "description": "internet bill last monday",
+    "timestamp": "2025-02-15T04:00:16.280Z"
+  },
+  {
+    "date": "2025-02-10T04:12:03.127Z",
+    "amount": 300000,
+    "category": "food",
+    "description": "\"internet bill last monday, 330k lunch",
+    "timestamp": "2025-02-15T04:12:03.127Z"
+  },
+  {
+    "date": "2025-02-15T04:19:41.882Z",
+    "amount": 312000,
+    "category": "entertainment",
+    "description": "snack , valentine 120k, game 1000",
+    "timestamp": "2025-02-15T04:19:41.882Z"
+  },
+  {
+    "date": "2025-02-15T04:24:25.417Z",
+    "amount": 50000,
+    "category": "food",
+    "description": "\"lunch at restaurant",
+    "timestamp": "2025-02-15T04:24:25.418Z"
+  },
+  {
+    "date": "2025-02-14T04:24:25.418Z",
+    "amount": 200000,
+    "category": "transport",
+    "description": "taxi to work yesterday\" \"bought groceries 300k",
+    "timestamp": "2025-02-15T04:24:25.418Z"
+  },
+  {
+    "date": "2025-02-15T04:24:25.418Z",
+    "amount": 400000,
+    "category": "utilities",
+    "description": "paid internet bill",
+    "timestamp": "2025-02-15T04:24:25.418Z"
+  },
+  {
+    "date": "2025-02-15T04:24:25.418Z",
+    "amount": 150000,
+    "category": "entertainment",
+    "description": "and movie tickets \"",
+    "timestamp": "2025-02-15T04:24:25.418Z"
+  },
+  {
+    "date": "2025-02-15T04:45:36.387Z",
+    "amount": 50000,
+    "category": "food",
+    "description": "ăn trưa hôm qua và mua sắm 20 hôm nay",
+    "timestamp": "2025-02-15T04:45:36.387Z"
+  },
+  {
+    "date": "2025-02-15T04:46:53.012Z",
+    "amount": 20000,
+    "category": "shopping",
+    "description": "mua sắm hôm nay",
+    "timestamp": "2025-02-15T04:46:53.012Z"
+  },
+  {
+    "date": "2025-02-15T04:47:41.662Z",
+    "amount": 150000,
+    "category": "food",
+    "description": "mua đồ ăn tối hết",
+    "timestamp": "2025-02-15T04:47:41.663Z"
+  },
+  {
+    "date": "2025-02-14T04:48:07.463Z",
+    "amount": 150000,
+    "category": "food",
+    "description": "mua đồ ăn tối hết vào 7 giờ tối ngày hôm qua",
+    "timestamp": "2025-02-15T04:48:07.463Z"
+  },
+  {
+    "date": "2025-02-14T04:48:30.753Z",
+    "amount": 150000,
+    "category": "food",
+    "description": "mua đồ ăn tối hết vào 7 giờ tối hôm qua",
+    "timestamp": "2025-02-15T04:48:30.753Z"
+  },
+  {
+    "date": "2025-02-14T04:49:00.567Z",
+    "amount": 120000,
+    "category": "food",
+    "description": "mua đồ ăn tối hết vào 7 giờ tối hôm qua",
+    "timestamp": "2025-02-15T04:49:00.567Z"
+  },
+  {
+    "date": "2025-02-15T08:49:55.118Z",
+    "amount": 20000,
+    "category": "other",
+    "description": "tieefn an",
+    "timestamp": "2025-02-15T08:49:55.124Z"
+  },
+  {
+    "date": "2025-02-17T08:22:53.817Z",
+    "amount": 30000,
+    "category": "other",
+    "description": "tien an anh dong",
+    "timestamp": "2025-02-17T08:22:53.889Z"
+  }
+]
