@@ -135,7 +135,7 @@ const getAIResponse = async (message) => {
 };
 
 // Chat endpoints with better error handling
-app.post('/api/chat', async (req, res) => {
+app.post('/chat', async (req, res) => {
   try {
     const { message } = req.body;
     
