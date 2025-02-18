@@ -20,52 +20,12 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
 
-// Chat endpoints
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { message } = req.body;
-    const response = await getAIResponse(message);
-    res.json({ 
-      success: true, 
-      message: response.content,
-      source: response.source,
-      model: response.model,
-      provider: response.provider
-    });
-  } catch (error) {
-    console.error('Chat error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to process chat message.'
-    });
-  }
-});
 
-const getAIResponse = async (message) => {
-  const models = [
-    { fn: getChatGPTResponse, name: 'ChatGPT' },
-    { fn: getGeminiResponse, name: 'Gemini' },
-    { fn: getClaudeResponse, name: 'Claude' }
-  ];
-
-  for (const model of models) {
-    try {
-      const response = await model.fn(message);
-      console.log(`Successfully got response from ${model.name}`);
-      return response;
-    } catch (error) {
-      console.log(`${model.name} failed, trying next model...`);
-      continue;
-    }
-  }
-
-  // If all AI models fail, return mock response
-  return getMockResponse(message);
-};
 
 // Add the missing response functions
 const getChatGPTResponse = async (message) => {
   try {
+    console.log(message);
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: message }],
       model: "gpt-3.5-turbo",
@@ -87,9 +47,7 @@ const getChatGPTResponse = async (message) => {
 
 const getGeminiResponse = async (message) => {
   try {
-    console.log(message);
     const result = await geminiModel.generateContent(message);
-    console.log(result);
     const response = await result.response;
     return {
       content: response.text(),
@@ -105,7 +63,6 @@ const getGeminiResponse = async (message) => {
 
 const getClaudeResponse = async (message) => {
   try {
-    console.log(message);
     const response = await anthropic.messages.create({
       model: "claude-3-sonnet-20240229",
       max_tokens: 150,
@@ -143,6 +100,52 @@ const getMockResponse = (message) => {
     provider: 'System'
   };
 };
+
+const getAIResponse = async (message) => {
+  const models = [
+    { fn: getChatGPTResponse, name: 'ChatGPT' },
+    { fn: getGeminiResponse, name: 'Gemini' },
+    { fn: getClaudeResponse, name: 'Claude' }
+  ];
+
+  for (const model of models) {
+    try {
+      const response = await model.fn(message);
+      console.log(`Successfully got response from ${model.name}`);
+      return response;
+    } catch (error) {
+      console.log(`${model.name} failed, trying next model...`);
+      continue;
+    }
+  }
+
+  // If all AI models fail, return mock response
+  return getMockResponse(message);
+};
+
+// Chat endpoints
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+    console.log(message);
+    const response = await getAIResponse(message);
+    res.json({ 
+      success: true, 
+      message: response.content,
+      source: response.source,
+      model: response.model,
+      provider: response.provider
+    });
+  } catch (error) {
+    console.error('Chat error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to process chat message.'
+    });
+  }
+});
+
+
 
 // Export the serverless handler
 export const handler = serverless(app); 
