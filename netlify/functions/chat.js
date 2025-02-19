@@ -51,7 +51,7 @@ const getChatGPTResponse = async (message) => {
 
                    If you're not sure about specific details, recommend visitors to contact Thanh directly.`
         }, { role: "user", content: message }],
-      model: "omni-moderation-*",
+      model: "omni-moderation-latest",
       max_tokens: 150,
       temperature: 0.7,
       response_format: { type: "text" }
