@@ -27,6 +27,38 @@ function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
+  const renderMessageContent = (content, mediaType) => {
+    if (mediaType === 'media') {
+      // Handle markdown images
+      const imageMatch = content.match(/!\[.*?\]\((.*?)\)/);
+      if (imageMatch) {
+        return (
+          <div className="message-content">
+            <img src={imageMatch[1]} alt="AI Generated" className="message-image" />
+            <p>{content.replace(/!\[.*?\]\((.*?)\)/, '')}</p>
+          </div>
+        );
+      }
+
+      // Handle video links
+      const videoMatch = content.match(/\[video\]\((.*?)\)/);
+      if (videoMatch) {
+        return (
+          <div className="message-content">
+            <video controls className="message-video">
+              <source src={videoMatch[1]} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <p>{content.replace(/\[video\]\((.*?)\)/, '')}</p>
+          </div>
+        );
+      }
+    }
+
+    // Default text rendering
+    return <p>{content}</p>;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -63,7 +95,8 @@ function Chatbot() {
           content: data.message,
           source: data.source,
           model: data.model,
-          provider: data.provider
+          provider: data.provider,
+          mediaType: data.mediaType
         }]);
       } else {
         throw new Error(data.message);
@@ -72,7 +105,9 @@ function Chatbot() {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "Sorry, I'm having trouble responding right now. Please try again later.",
+        content: error.message.includes('quota') ? 
+          "AI services are currently busy. Please try again in a few minutes." :
+          "Sorry, I'm having trouble responding right now. Please try again later.",
         source: 'Error',
         model: 'N/A',
         provider: 'System'
@@ -143,7 +178,7 @@ function Chatbot() {
                 key={index} 
                 className={`message ${msg.role === 'user' ? 'user' : 'assistant'}`}
               >
-                {msg.content}
+                {renderMessageContent(msg.content, msg.mediaType)}
                 <span className="message-source">
                   {msg.source} 
                   {msg.model !== 'Human' && ` • ${msg.model}`} 

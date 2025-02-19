@@ -66,6 +66,7 @@
   padding: 0.8rem 1rem;
   border-radius: 12px;
   font-size: 0.9rem;
+  word-break: break-word;
 }
 
 .message.user {
@@ -80,6 +81,13 @@
   color: #333;
   align-self: flex-start;
   border-bottom-left-radius: 4px;
+}
+
+.message.assistant img,
+.message.assistant video {
+  background: white;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .chatbot-input {
@@ -157,4 +165,23 @@
 .message.assistant .message-source {
   text-align: left;
   color: rgba(0, 0, 0, 0.6);
+}
+
+/* Add these styles for media content */
+.message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.message-image {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.message-video {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 0.5rem;
 } 

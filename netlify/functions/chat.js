@@ -36,22 +36,44 @@ const anthropic = new Anthropic({
 // Add the missing response functions
 const getChatGPTResponse = async (message) => {
   try {
-    console.log(message);
     const completion = await openai.chat.completions.create({
-      messages: [{ role: "user", content: message }],
-      model: "gpt-3.5-turbo",
+      messages: [{
+          role: "system",
+          content: `You are a helpful assistant for Thanh Duong's personal website. 
+
+                   You help visitors learn more about Thanh, who is a Machine Learning Engineer at VNNIC.
+
+                   His expertise includes Computer Vision, Deep Learning, and MLOps.
+
+                   He studied at Hanoi University of Science and Technology.
+
+                   Keep responses concise, friendly, and focused on Thanh's professional background.
+
+                   If you're not sure about specific details, recommend visitors to contact Thanh directly.`
+        }, { role: "user", content: message }],
+      model: "omni-moderation-*",
       max_tokens: 150,
-      temperature: 0.7
+      temperature: 0.7,
+      response_format: { type: "text" }
     });
 
+    const content = completion.choices[0].message.content;
+    
+    // Check if content contains image/video markdown
+    const hasMedia = content.includes('![') || content.includes('[video]');
+    
     return {
-      content: completion.choices[0].message.content,
+      content: content,
       source: 'ChatGPT',
       model: 'GPT-3.5 Turbo',
-      provider: 'OpenAI'
+      provider: 'OpenAI',
+      mediaType: hasMedia ? 'media' : 'text'
     };
   } catch (error) {
     console.error('ChatGPT Error:', error);
+    if (error.message?.includes('rate_limit') || error.message?.includes('quota')) {
+      throw new Error('ChatGPT API quota exceeded. Please try again in a few minutes.');
+    }
     throw error;
   }
 };
@@ -68,6 +90,10 @@ const getGeminiResponse = async (message) => {
     };
   } catch (error) {
     console.error('Gemini Error:', error);
+    // Check for quota exceeded error
+    if (error.message?.includes('quota') || error.message?.includes('rate limit')) {
+      throw new Error('Gemini API quota exceeded. Please try again in a few minutes.');
+    }
     throw error;
   }
 };
@@ -80,37 +106,62 @@ const getClaudeResponse = async (message) => {
       messages: [{ role: "user", content: message }]
     });
 
+    const content = response.content[0].text;
+    const hasMedia = content.includes('![') || content.includes('[video]');
+
     return {
-      content: response.content[0].text,
+      content: content,
       source: 'Claude',
       model: 'Claude 3 Sonnet',
-      provider: 'Anthropic'
+      provider: 'Anthropic',
+      mediaType: hasMedia ? 'media' : 'text'
     };
   } catch (error) {
     console.error('Claude Error:', error);
+    if (error.message?.includes('rate_limit') || error.message?.includes('quota')) {
+      throw new Error('Claude API quota exceeded. Please try again in a few minutes.');
+    }
     throw error;
   }
+};
+
+
+const mockResponses = {
+  default: "Hi! I'm here to help you learn more about Thanh Duong. What would you like to know?",
+  greetings: ["hi", "hello", "hey"],
+  skills: ["skills", "expertise", "tech", "technology", "experience"],
+  background: ["background", "education", "study", "university"],
+  projects: ["project", "work", "portfolio"],
+  contact: ["contact", "email", "reach"]
 };
 
 const getMockResponse = (message) => {
   const lowerMessage = message.toLowerCase();
   
-  if (lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
-    return {
-      content: "Hello! How can I assist you today?",
-      source: 'Mock',
-      model: 'Rule-based',
-      provider: 'System'
-    };
+  if (mockResponses.greetings.some(word => lowerMessage.includes(word))) {
+    return "Hello! How can I assist you today?";
   }
   
-  return {
-    content: "I understand you're interested in learning more. Could you please be more specific?",
-    source: 'Mock',
-    model: 'Rule-based',
-    provider: 'System'
-  };
+  if (mockResponses.skills.some(word => lowerMessage.includes(word))) {
+    return "Thanh Duong specializes in Machine Learning Engineering, with expertise in Computer Vision, Deep Learning, and MLOps. He's proficient in PyTorch, Python, and various ML frameworks.";
+  }
+  
+  if (mockResponses.background.some(word => lowerMessage.includes(word))) {
+    return "Thanh Duong is a MLE at VNNIC. He studied at Hanoi University of Science and Technology.";
+  }
+  
+  if (mockResponses.projects.some(word => lowerMessage.includes(word))) {
+    return "Thanh has worked on various ML projects including computer vision applications and deep learning model optimization. You can check out his projects in the Projects section.";
+  }
+  
+  if (mockResponses.contact.some(word => lowerMessage.includes(word))) {
+    return "You can contact Thanh through the Contact form on this website. He'll get back to you as soon as possible!";
+  }
+  
+  return "I understand you're interested in learning more about Thanh. Could you please be more specific about what you'd like to know?";
 };
+
+
 
 const getAIResponse = async (message) => {
   const models = [
@@ -140,30 +191,60 @@ app.post('/chat', async (req, res) => {
     const { message } = req.body;
     
     if (!message) {
-      console.error('No message provided in request body');
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: 'Message is required'
       });
     }
 
-    console.log('Processing message:', message);
-    const response = await getAIResponse(message);
-    
-    console.log('AI Response:', response);
-    res.json({ 
-      success: true, 
+    let response;
+    let currentModel = 0;
+    const models = [
+      { fn: getChatGPTResponse, name: 'ChatGPT' },
+      { fn: getGeminiResponse, name: 'Gemini' },
+      { fn: getClaudeResponse, name: 'Claude' }
+    ];
+
+    while (currentModel < models.length) {
+      try {
+        response = await models[currentModel].fn(message);
+        break;
+      } catch (error) {
+        console.log(`${models[currentModel].name} failed:`, error.message);
+        if (error.message?.includes('quota') || error.message?.includes('rate limit')) {
+          currentModel++;
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    if (!response) {
+      response = {
+        content: "All AI services are currently at capacity. Please try again in a few minutes.",
+        source: 'System',
+        model: 'Fallback',
+        provider: 'Local',
+        mediaType: 'text'
+      };
+    }
+
+    res.json({
+      success: true,
       message: response.content,
       source: response.source,
       model: response.model,
-      provider: response.provider
+      provider: response.provider,
+      mediaType: response.mediaType || 'text'
     });
   } catch (error) {
     console.error('Chat error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to process chat message',
-      error: error.message
+    res.status(500).json({
+      success: false,
+      message: error.message || 'An error occurred while processing your request',
+      source: 'Error',
+      model: 'N/A',
+      provider: 'System'
     });
   }
 });
