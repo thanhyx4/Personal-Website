@@ -1,3 +1,7 @@
 .env
 .env.production
 server.js
+contacts
+spending
+contacts/*
+spending/*
