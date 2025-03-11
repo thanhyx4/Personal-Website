@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import config from '../config';
+
+const API_URL = `${config.apiUrl}/api/contact`;
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -24,7 +27,7 @@ function Contact() {
     setStatus({ message: 'Sending...', type: '' });
 
     try {
-      const response = await fetch('http://localhost:3001/api/contact', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

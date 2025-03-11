@@ -25,7 +25,7 @@ const openai = new OpenAI({
 });
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
