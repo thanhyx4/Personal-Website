@@ -295,6 +295,53 @@ app.get('/api/spending/stats', async (req, res) => {
   }
 });
 
+
+// Function to handle storing contact information in MongoDB
+const storeContactInfo = async (contactData) => {
+  const uri = process.env.MONGODB_URI; // MongoDB connection string from environment variables
+  const client = new MongoClient(uri);
+
+  try {
+    // Connect to the MongoDB client
+    await client.connect();
+    const database = client.db("contact-db"); // Replace with your database name
+    const contactsCollection = database.collection("contacts"); // Collection to store contacts
+
+    // Insert the contact data into the collection
+    const result = await contactsCollection.insertOne(contactData);
+    console.log(`New contact created with the following id: ${result.insertedId}`);
+  } catch (error) {
+    console.error("Error storing contact information:", error);
+    throw new Error("Failed to store contact information.");
+  } finally {
+    // Ensure the client is closed after the operation
+    await client.close();
+  }
+};
+
+// Example usage of the storeContactInfo function
+app.post("/api/contact", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+    const timestamp = new Date().toISOString();
+    const contactData = {
+      timestamp,
+      name,
+      email,
+      message,
+    };
+
+    // Call the function to store contact information in MongoDB
+    await storeContactInfo(contactData);
+
+    res.json({ success: true, message: "Contact information saved successfully!" });
+  } catch (error) {
+    console.error("Error saving contact:", error);
+    res.status(500).json({ success: false, message: "Failed to save contact information." });
+  }
+});
+
+
 // Update CORS configuration
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*', // Or your specific domain in production
